@@ -3,12 +3,12 @@ import 'dart:io';
 import 'package:auth_api/features/authentication/presentation/bloc/authentication_bloc.dart';
 import 'package:auth_api/features/authentication/presentation/components/text_format_field.dart';
 import 'package:auth_api/features/authentication/presentation/components/password_form_field.dart';
+import 'package:auth_api/features/authentication/presentation/screens/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 
-
-import '../../../home/home.dart';
+import '../components/validators.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -35,6 +35,8 @@ class _RegisterPageState extends State<RegisterPage> {
   TextEditingController locationAddress = TextEditingController();
   TextEditingController locationCoordinates = TextEditingController();
   File? _selectedImage;
+  bool obsecurePassword = true;
+  bool obsecureConfirmPassword = true;
 
   Future<void> _picImage() async {
     final picker = ImagePicker();
@@ -44,6 +46,11 @@ class _RegisterPageState extends State<RegisterPage> {
       setState(() {
         _selectedImage = File(pickedFile.path);
       });
+    } else {
+      // Handle error or user cancellation
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No image selected')),
+      );
     }
   }
 
@@ -58,35 +65,41 @@ class _RegisterPageState extends State<RegisterPage> {
               width: MediaQuery.of(context).size.width / 1.5,
               height: MediaQuery.of(context).size.height / 3,
               decoration: const BoxDecoration(
-                  image: DecorationImage(
-                fit: BoxFit.fill,
-                image: AssetImage("assets/giphy.gif"),
-              )),
+                image: DecorationImage(
+                  fit: BoxFit.fill,
+                  image: AssetImage("assets/giphy.gif"),
+                ),
+              ),
             ),
             TextFromatField(
               controller: name,
               label: "Name",
               fKey: nkey,
+              validator: validateName,
             ),
             TextFromatField(
               controller: email,
               label: "Email",
               fKey: ekey,
+              validator: validateEmail,
             ),
             TextFromatField(
               controller: phone,
               label: "Phone",
               fKey: pkey,
+              validator: validatePhone,
             ),
             PasswordFormatField(
               controller: password,
               fKey: pwkey,
               label: "Password",
+              validator: validateRegistrationPassword,
             ),
             PasswordFormatField(
               controller: confirmPass,
               fKey: cpwkey,
               label: "Confirm Password",
+              validator: (value) => validateConfirmPassword(value, password.text),
             ),
             TextFromatField(
               controller: locationName,
@@ -105,72 +118,73 @@ class _RegisterPageState extends State<RegisterPage> {
             ),
             ElevatedButton(
               onPressed: _picImage,
-              child: const Text('choose Profile Picture'),
+              child: const Text('Choose Profile Picture'),
             ),
-            if(_selectedImage != null) Image.file(_selectedImage!),
+            if (_selectedImage != null) Image.file(_selectedImage!),
             ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  elevation: 10,
-                  backgroundColor: Colors.blue,
-                ),
-                onPressed: () {
-                  if (nkey.currentState!.validate() &&
-                      ekey.currentState!.validate() &&
-                      pkey.currentState!.validate() &&
-                      pwkey.currentState!.validate() &&
-                      cpwkey.currentState!.validate() &&
-                      locNkey.currentState!.validate() &&
-                      locAkey.currentState!.validate() &&
-                      locCkey.currentState!.validate()) {
-                    List<String> coordinates =
-                        locationCoordinates.text.split(',');
-                    Map<String, dynamic> location = {
-                      "name": locationName.text,
-                      "address": locationAddress.text,
-                      "coordinates": coordinates
-                          .map((e) => double.parse(e.trim()))
-                          .toList()
-                    };
+              style: ElevatedButton.styleFrom(
+                elevation: 10,
+                backgroundColor: Colors.blue,
+              ),
+              onPressed: () {
+                if (nkey.currentState!.validate() &&
+                    ekey.currentState!.validate() &&
+                    pkey.currentState!.validate() &&
+                    pwkey.currentState!.validate() &&
+                    cpwkey.currentState!.validate() &&
+                    locNkey.currentState!.validate() &&
+                    locAkey.currentState!.validate() &&
+                    locCkey.currentState!.validate()) {
+                  List<String> coordinates =
+                  locationCoordinates.text.split(',');
+                  Map<String, dynamic> location = {
+                    "name": locationName.text,
+                    "address": locationAddress.text,
+                    "coordinates": coordinates
+                        .map((e) => double.parse(e.trim()))
+                        .toList()
+                  };
 
-                    context.read<AuthenticationBloc>().add(
-                          RegisterEvent(
-                              name: name.text,
-                              email: email.text,
-                              phone: phone.text,
-                              password: password.text,
-                              confirmPassword: confirmPass.text,
-                              location: location,
-                            profilePic: _selectedImage,
-                          ),
-                        );
+                  context.read<AuthenticationBloc>().add(
+                    RegisterEvent(
+                      name: name.text,
+                      email: email.text,
+                      phone: phone.text,
+                      password: password.text,
+                      confirmPassword: confirmPass.text,
+                      location: location,
+                      profilePic: _selectedImage,
+                    ),
+                  );
+                }
+              },
+              child: BlocConsumer<AuthenticationBloc, AuthenticationState>(
+                listener: (context, state) {
+                  if (state is AuthenticationSuccess) {
+                    // Navigate to home or login page
+                    Navigator.pushNamed(context, LoginPage.routName);
+                  } else if (state is AuthenticationError) {
+                    // Show error message
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(state.message)),
+                    );
                   }
                 },
-                child: BlocConsumer<AuthenticationBloc, AuthenticationState>(
-                  listener: (context, state) {
-                    if (state is AuthenticationSuccess) {
-                      // Navigate to home or login page
-                      Navigator.pushNamed(context, Home.routeName);
-                    } else if (state is AuthenticationError) {
-                      // Show error message
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(state.message)),
-                      );
-                    }
-                  },
-                  builder: (context, state) {
-                    if (state is AuthenticationLoading) {
-                      return const CircularProgressIndicator();
-                    } else {
-                      return const Text(
-                        "Register",
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: Colors.black,
-                        ),
-                      );
-                    }
-                  },
-                )),
+                builder: (context, state) {
+                  if (state is AuthenticationLoading) {
+                    return const CircularProgressIndicator();
+                  } else {
+                    return const Text(
+                      "Register",
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.black,
+                      ),
+                    );
+                  }
+                },
+              ),
+            ),
           ],
         ),
       ),

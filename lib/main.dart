@@ -7,6 +7,8 @@ import 'package:auth_api/features/home/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'features/authentication/domain/Reoposetory/register_repo.dart';
+import 'features/authentication/domain/Reoposetory/update_repo.dart';
+import 'features/authentication/presentation/screens/update_page.dart';
 
 
 void main() {
@@ -33,7 +35,7 @@ class AuthApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => AuthenticationBloc(LoginRepo(), RegisterRepo())),
+        BlocProvider(create: (context) => AuthenticationBloc(LoginRepo(), RegisterRepo(),UserService(),)),
       ],
       child: MaterialApp(
         initialRoute: LoginPage.routName,
@@ -42,6 +44,7 @@ class AuthApp extends StatelessWidget {
           RegisterPage.routName: (context) => const RegisterPage(),
           LoginPage.routName: (context) => const LoginPage(),
           Home.routeName: (context) => const Home(),
+          UpdateUserPage.routeName: (context) => const UpdateUserPage(),
         },
       ),
     );

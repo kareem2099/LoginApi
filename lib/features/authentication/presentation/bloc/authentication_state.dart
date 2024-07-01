@@ -1,23 +1,44 @@
-// ignore_for_file: must_be_immutable
-
 part of 'authentication_bloc.dart';
 
 @immutable
-sealed class AuthenticationState extends Equatable {
+abstract class AuthenticationState extends Equatable {
+  const AuthenticationState();
+
   @override
-  List<Object?> get props => [];
+  List<Object> get props => [];
 }
 
-final class AuthenticationInitial extends AuthenticationState {}
+class AuthenticationInitial extends AuthenticationState {}
 
-final class AuthenticationLoading extends AuthenticationState {}
+class AuthenticationLoading extends AuthenticationState {}
 
-final class AuthenticationSuccess extends AuthenticationState {}
+class AuthenticationSuccess extends AuthenticationState {
+  final String token;
 
-final class AuthenticationError extends AuthenticationState {
+  const AuthenticationSuccess({required this.token});
+
+  @override
+  List<Object> get props => [token];
+}
+
+class AuthenticationError extends AuthenticationState {
   final String message;
 
-  AuthenticationError({required this.message});
-    @override
-  List<Object?> get props => [message];
+  const AuthenticationError({required this.message});
+
+  @override
+  List<Object> get props => [message];
+}
+
+class UserUpdateLoading extends AuthenticationState {}
+
+class UserUpdateSuccess extends AuthenticationState {}
+
+class UserUpdateError extends AuthenticationState {
+  final String message;
+
+  const UserUpdateError({required this.message});
+
+  @override
+  List<Object> get props => [message];
 }

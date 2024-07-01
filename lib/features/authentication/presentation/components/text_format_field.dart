@@ -4,12 +4,16 @@ class TextFromatField extends StatelessWidget {
   final TextEditingController controller;
   final String label;
   final GlobalKey<FormState> fKey;
+  final String? Function(String?)? validator;
+
   const TextFromatField({
     super.key,
     required this.controller,
     required this.label,
     required this.fKey,
+    this.validator,
   });
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -19,16 +23,12 @@ class TextFromatField extends StatelessWidget {
         child: TextFormField(
           controller: controller,
           decoration: InputDecoration(
-              labelText: label,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(5),
-              )),
-          validator: (value) {
-            if (value!.isEmpty) {
-              return "please enter a value";
-            }
-            return null;
-          },
+            labelText: label,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(5),
+            ),
+          ),
+          validator: validator,
         ),
       ),
     );

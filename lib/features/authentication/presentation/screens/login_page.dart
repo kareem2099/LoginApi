@@ -6,6 +6,8 @@ import 'package:auth_api/features/home/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../components/validators.dart';
+
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
   static String routName = "LoginPage";
@@ -21,6 +23,7 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
   bool isLoading = false;
+  bool obsecure = true;
 
   @override
   void initState() {
@@ -54,8 +57,9 @@ class _LoginPageState extends State<LoginPage> {
             ),
             PasswordFormatField(
               fKey: passwordKey,
-              label: "password",
+              label: "Password",
               controller: password,
+              validator: validateLoginPassword,
             ),
             BlocListener<AuthenticationBloc, AuthenticationState>(
               listener: (context, state) {

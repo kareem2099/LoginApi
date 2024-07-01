@@ -1,17 +1,21 @@
 part of 'authentication_bloc.dart';
 
-
 @immutable
-sealed class AuthenticationEvent extends Equatable {}
+abstract class AuthenticationEvent extends Equatable {
+  const AuthenticationEvent();
+
+  @override
+  List<Object> get props => [];
+}
 
 class LoginEvent extends AuthenticationEvent {
   final String email;
   final String password;
 
-  LoginEvent({required this.email, required this.password});
+  const LoginEvent({required this.email, required this.password});
 
   @override
-  List<Object?> get props => [email, password];
+  List<Object> get props => [email, password];
 }
 
 class RegisterEvent extends AuthenticationEvent {
@@ -23,10 +27,33 @@ class RegisterEvent extends AuthenticationEvent {
   final Map<String, dynamic> location;
   final File? profilePic;
 
-  RegisterEvent({required this.name, required this.email, required this.phone, required this.password, required this.confirmPassword,required this.location,required this.profilePic,});
+  const RegisterEvent({
+    required this.name,
+    required this.email,
+    required this.phone,
+    required this.password,
+    required this.confirmPassword,
+    required this.location,
+    this.profilePic,
+  });
 
   @override
-  List<Object?> get props => [name,email,phone, password,confirmPassword,location,profilePic];
+  List<Object> get props => [name, email, phone, password, confirmPassword, location];
 }
 
+class UpdateUserEvent extends AuthenticationEvent {
+  final String name;
+  final String phone;
+  final String location;
+  final File? profilePic;
 
+  const UpdateUserEvent({
+    required this.name,
+    required this.phone,
+    required this.location,
+    this.profilePic,
+  });
+
+  @override
+  List<Object> get props => [name, phone, location];
+}
