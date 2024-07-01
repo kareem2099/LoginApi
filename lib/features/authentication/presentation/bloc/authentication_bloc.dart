@@ -8,7 +8,6 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:meta/meta.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 part 'authentication_event.dart';
 part 'authentication_state.dart';
@@ -30,9 +29,8 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
     final res = await auth.login(email: event.email, password: event.password);
 
     if (res[1] == 200) {
-      final token = res[0]['token'];
-      await _secureStorage.write(key: 'token', value: token);
-      emit(AuthenticationSuccess(token: token));
+
+      emit(AuthenticationSuccess());
     } else if (res[1] == 403) {
       emit(AuthenticationError(message: "Invalid user information as email or password."));
     } else {
@@ -53,7 +51,7 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
     );
 
     if (res[1] == 200) {
-      emit(AuthenticationSuccess(token: ''));
+      emit(AuthenticationSuccess());
     } else if (res[1] == 400) {
       final responseBody = res[0]; // Assuming res[0] contains the response body
       print("ResponseBody: $responseBody");

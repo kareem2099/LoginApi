@@ -13,18 +13,18 @@ import 'features/authentication/presentation/screens/update_page.dart';
 
 void main() {
   LoginRepo auth = LoginRepo();
-  auth.login(email: "kareem209907@gmail.com", password: "22315564Km@");
+  auth.login(email: "kareem209907@gmail.com", password: "123456789Km@");
   RegisterRepo registerRepo = RegisterRepo();
 
   // Creating the location map
   Map<String, dynamic> location = {
     "name": "Egypt",
-    "address": "meet halfa",
+    "address": "asyut",
     "coordinates": [1214451511, 12541845]
   };
 
 
-  registerRepo.register(name: "kareem", email: "kareem209907@gmail.com", phone: "01022876456", password: "22315564Km@",confirmPassword:"22315564Km@", location: location);
+  registerRepo.register(name: "kareem", email: "kareem209907@gmail.com", phone: "01022876456", password: "123456789Km@",confirmPassword:"123456789Km@", location: location);
   runApp(const AuthApp());
 }
 

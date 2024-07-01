@@ -38,16 +38,19 @@ class RegisterEvent extends AuthenticationEvent {
   });
 
   @override
-  List<Object> get props => [name, email, phone, password, confirmPassword, location];
+  List<Object> get props =>
+      [name, email, phone, password, confirmPassword, location];
 }
 
 class UpdateUserEvent extends AuthenticationEvent {
+  final String token;
   final String name;
   final String phone;
   final String location;
   final File? profilePic;
 
   const UpdateUserEvent({
+    required this.token,
     required this.name,
     required this.phone,
     required this.location,
@@ -55,5 +58,5 @@ class UpdateUserEvent extends AuthenticationEvent {
   });
 
   @override
-  List<Object> get props => [name, phone, location];
+  List<Object> get props => [token, name, phone, location];
 }

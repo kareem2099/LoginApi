@@ -1,12 +1,12 @@
 import 'dart:convert';
 
-import 'package:auth_api/features/authentication/domain/Reoposetory/update_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:auth_api/features/authentication/presentation/bloc/authentication_bloc.dart';
 
+import '../../data/base/token.dart';
 
 class UpdateUserPage extends StatefulWidget {
   const UpdateUserPage({super.key});
@@ -20,8 +20,10 @@ class _UpdateUserPageState extends State<UpdateUserPage> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _locationNameController = TextEditingController();
-  final TextEditingController _locationAddressController = TextEditingController();
-  final TextEditingController _locationCoordinatesController = TextEditingController();
+  final TextEditingController _locationAddressController =
+      TextEditingController();
+  final TextEditingController _locationCoordinatesController =
+      TextEditingController();
   File? _selectedImage;
 
   final ImagePicker _picker = ImagePicker();
@@ -78,7 +80,8 @@ class _UpdateUserPageState extends State<UpdateUserPage> {
                 ),
                 TextFormField(
                   controller: _locationAddressController,
-                  decoration: const InputDecoration(labelText: 'Location Address'),
+                  decoration:
+                      const InputDecoration(labelText: 'Location Address'),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your location address';
@@ -88,7 +91,8 @@ class _UpdateUserPageState extends State<UpdateUserPage> {
                 ),
                 TextFormField(
                   controller: _locationCoordinatesController,
-                  decoration: const InputDecoration(labelText: 'Location Coordinates (comma separated)'),
+                  decoration: const InputDecoration(
+                      labelText: 'Location Coordinates (comma separated)'),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your location coordinates';
@@ -111,32 +115,40 @@ class _UpdateUserPageState extends State<UpdateUserPage> {
                 ElevatedButton(
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-        
-                      final token = await getToken();
+                      const String token =
+                          "FOODAPI eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0OWVmNDExNjFjYWZjOTg5ZGE4YmQ2YSIsImVtYWlsIjoiYW5hcy5yb3V0ZUBnbWFpbC5jb20iLCJuYW1lIjoidGVzdHBob25lIiwiaWF0IjoxNjg4MTYyMDI1fQ.qxLbn5n2g1MXNwAuqMx4nwlmuMbCIsSbY4j_FzHeV9E";
+                      // String? token = await getAuthToken();
                       print("Token update retrieved: $token"); // Add this line
-                     final prefixedToken = "FOODAPI $token";
-                      print("Token update retrieved: $prefixedToken"); // Add this line
-                      if(prefixedToken == null) {
-                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('token is missing'),));
+                      // final prefixedToken = "FOODAPI $token";
+                      // print(
+                      //     "Token update retrieved: $prefixedToken"); // Add this line
+                      if (token == null) {
+                        ScaffoldMessenger.of(context)
+                            .showSnackBar(const SnackBar(
+                          content: Text('token is missing'),
+                        ));
                         return;
                       }
-                      List<String> coordinates = _locationCoordinatesController.text.split(',');
+                      List<String> coordinates =
+                          _locationCoordinatesController.text.split(',');
                       Map<String, dynamic> location = {
                         "name": _locationNameController.text,
                         "address": _locationAddressController.text,
-                        "coordinates": coordinates.map((e) => double.parse(e.trim())).toList()
+                        "coordinates": coordinates
+                            .map((e) => double.parse(e.trim()))
+                            .toList()
                       };
-        
+
                       context.read<AuthenticationBloc>().add(
-                        UpdateUserEvent(
-        
-                          name: _nameController.text,
-                          phone: _phoneController.text,
-                          location: jsonEncode(location),
-                          profilePic: _selectedImage,
-                        ),
-                      );
-                                      }
+                            UpdateUserEvent(
+                              token: token,
+                              name: _nameController.text,
+                              phone: _phoneController.text,
+                              location: jsonEncode(location),
+                              profilePic: _selectedImage,
+                            ),
+                          );
+                    }
                   },
                   child: const Text('Update'),
                 ),
@@ -144,7 +156,8 @@ class _UpdateUserPageState extends State<UpdateUserPage> {
                   listener: (context, state) {
                     if (state is UserUpdateSuccess) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('User updated successfully')),
+                        const SnackBar(
+                            content: Text('User updated successfully')),
                       );
                     } else if (state is UserUpdateError) {
                       ScaffoldMessenger.of(context).showSnackBar(
