@@ -16,7 +16,8 @@ class RegisterRepo {
     required String password,
     required Map<String, dynamic> location,
     File? profilePic,
-    required String confirmPassword, // Add profilePic parameter
+    required String confirmPassword,
+
   }) async {
     var request = http.MultipartRequest('POST', Uri.parse(apiReg));
     request.fields['name'] = name;
